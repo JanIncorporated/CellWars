@@ -4,7 +4,7 @@ class Cell {
 		this.height = cell.height;
 		this.owner = owner;
 		this.hp = owner.hp;
-		this.isSleep = false;
+		this.resultHp = 0;
 	}
 	GetCell(x, y) {
 		return '<div class="cell" id="cell-' + x + y + '" style="' +

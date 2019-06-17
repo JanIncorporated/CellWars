@@ -49,37 +49,40 @@ class Field {
 		let owner = this.field[i][j].owner;
 		if (j + 1 < this.width)
 			if (owner.name != this.field[i][j + 1].owner.name)
-				this.atack(cell, this.field[i][j + 1], i, j + 1);
+				this.mark(cell, this.field[i][j + 1], i, j + 1);
 		if (i + 1 < this.height)
 			if (owner.name != this.field[i + 1][j].owner.name)
-				this.atack(cell, this.field[i + 1][j], i + 1, j);
+				this.mark(cell, this.field[i + 1][j], i + 1, j);
 		if (j - 1 > 0)
 			if (owner.name != this.field[i][j - 1].owner.name)
-				this.atack(cell, this.field[i][j - 1], i, j - 1);
+				this.mark(cell, this.field[i][j - 1], i, j - 1);
 		if (i - 1 > 0)
 			if (owner.name != this.field[i - 1][j].owner.name)
-				this.atack(cell, this.field[i - 1][j], i - 1, j);
+				this.mark(cell, this.field[i - 1][j], i - 1, j);
 	}
-	atack(attaker, target, i, j) {
-		if (attaker.isSleep) {
-			attaker.isSleep = false;
-			return;
-		}
+	mark(attaker, target, i, j) {
 		let damage = attaker.GetDamage();
 		damage -= target.owner.defence;
 		if (damage <= 0) return;
 
-		target.hp -= damage;
-		if (target.hp > 0) 
-			$('#cell-' + j + i).html(target.hp);
-		else {
-			this.field[i][j].owner = attaker.owner;
-			this.field[i][j].hp = attaker.owner.hp;
-			$('#cell-' + j + i).css({background: attaker.owner.color});
-			$('#cell-' + j + i).html(attaker.owner.hp);
-			this.addMoney(attaker.owner.name, this.moneyForKill);
-			this.field[i][j].isSleep = true;
+		target.resultHp = target.hp - damage;
+		target.attaker = attaker;
+	}
+	atack(target, i, j) {
+		if (target.resultHp > 0) { 
+			target.hp = target.resultHp;
+			$('#cell-' + j + i).html(target.resultHp);
 		}
+		else {
+			console.log(target);
+			this.field[i][j].owner = target.attaker.owner;
+			this.field[i][j].hp = target.attaker.owner.hp;
+			$('#cell-' + j + i).css({background: target.attaker.owner.color});
+			$('#cell-' + j + i).html(target.attaker.owner.hp);
+			this.addMoney(target.attaker.owner.name, this.moneyForKill);
+		}
+		target.attaker = null;
+		target.resultHp = 0;
 	}
 	addMoney(ownerName, money) {
 		if (this.Player1.name == ownerName) {
@@ -95,6 +98,12 @@ class Field {
 		for (let i = 0; i < this.height; i++) {
 			for (var j = 0; j < this.width; j++) {
 				this.checkCell(i, j);
+			}
+		}
+		for (let i = 0; i < this.height; i++) {
+			for (var j = 0; j < this.width; j++) {
+				if (this.field[i][j].resultHp != 0)
+					this.atack(this.field[i][j], i, j);
 			}
 		}
 	}

@@ -14,6 +14,8 @@ class Game {
 		this.field = new Field(this.settings.field, this.settings.cell, this.playerOne, this.playerTwo, this.settings.moneyForKill);
 	}
 	iteration() {
+		setInterval(()=>{
 			this.field.iteration();
+		}, 5)
 	}
 }
