@@ -29,7 +29,8 @@ var GAME_SETTINGS = {
 	cell: {
 		height: 20,
 		width:  20
-	}
+	},
 
 	// Другие свойства
+	moneyForKill: 5
 }

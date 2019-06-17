@@ -1,0 +1,101 @@
+class Field {
+	constructor(field, cell, Player1, Player2, mfk) {
+		this.height = field.height;
+		this.width = field.width;
+		this.Player1 = Player1;
+		this.Player2 = Player2;
+		this.cell = cell;
+		this.field = [];
+		this.initField();
+		this.moneyForKill = mfk;
+	}
+	initField() {
+		let h = $('#field').height();
+		let minH = this.height * this.cell.height;
+		let w;
+		if (h > minH) {
+			w = h;
+		} else {
+			w = h = this.width * this.cell.width;
+		}
+		$('#field').css({width: w});
+		for (let i = 0; i < this.height; i++) {
+			this.field[i] = [];
+			let result = '';
+			for (var j = 0; j < this.width; j++) {
+				if (j < this.width / 2) {
+					this.field[i].push(new Cell(this.cell, this.Player1))
+				} else {
+					this.field[i].push(new Cell(this.cell, this.Player2))
+				}
+				result += this.field[i][j].GetCell(j, i);
+			}
+			$('#field').append('<div>' + result + '</div>');
+		}
+	}
+	// SetNewCell(i, j, c, fault) {
+	// 	c = getColor(c);
+	// 	if (c === '#000') {
+	// 		this.field[i][j].owner = fault.owner;
+	// 		this.field[i][j].color = fault.owner.color;
+	// 		c = fault.owner.color;
+	// 	} else {
+	// 		this.field[i][j].color = c;
+	// 	}
+	// 	$('#cell-' + j + '' + i).css({'background' : c});
+	// }
+	checkCell(i, j){
+		let cell = this.field[i][j];
+		let owner = this.field[i][j].owner;
+		if (j + 1 < this.width)
+			if (owner.name != this.field[i][j + 1].owner.name)
+				this.atack(cell, this.field[i][j + 1], i, j + 1);
+		if (i + 1 < this.height)
+			if (owner.name != this.field[i + 1][j].owner.name)
+				this.atack(cell, this.field[i + 1][j], i + 1, j);
+		if (j - 1 > 0)
+			if (owner.name != this.field[i][j - 1].owner.name)
+				this.atack(cell, this.field[i][j - 1], i, j - 1);
+		if (i - 1 > 0)
+			if (owner.name != this.field[i - 1][j].owner.name)
+				this.atack(cell, this.field[i - 1][j], i - 1, j);
+	}
+	atack(attaker, target, i, j) {
+		if (attaker.isSleep) {
+			attaker.isSleep = false;
+			return;
+		}
+		let damage = attaker.GetDamage();
+		damage -= target.owner.defence;
+		if (damage <= 0) return;
+
+		target.hp -= damage;
+		if (target.hp > 0) 
+			$('#cell-' + j + i).html(target.hp);
+		else {
+			this.field[i][j].owner = attaker.owner;
+			this.field[i][j].hp = attaker.owner.hp;
+			$('#cell-' + j + i).css({background: attaker.owner.color});
+			$('#cell-' + j + i).html(attaker.owner.hp);
+			this.addMoney(attaker.owner.name, this.moneyForKill);
+			this.field[i][j].isSleep = true;
+		}
+	}
+	addMoney(ownerName, money) {
+		if (this.Player1.name == ownerName) {
+			this.Player1.money += money;
+			$('#p1-money').html(this.Player1.money)
+		}
+		if (this.Player2.name == ownerName) {
+			this.Player2.money += money;
+			$('#p2-money').html(this.Player2.money)
+		}
+	} 
+	iteration() {
+		for (let i = 0; i < this.height; i++) {
+			for (var j = 0; j < this.width; j++) {
+				this.checkCell(i, j);
+			}
+		}
+	}
+}

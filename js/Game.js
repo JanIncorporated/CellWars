@@ -4,6 +4,16 @@ class Game {
 		this._initGame();
 	}
 	_initGame() {
-		_initDialog();
+		_initDialog(this);
+	}
+	twoPlayers() {
+		_destructDialog();
+		this.playerOne = new Player(this.settings.players[0]);
+		this.playerTwo = new Player(this.settings.players[1]);
+		_initTwoPlayers(this);
+		this.field = new Field(this.settings.field, this.settings.cell, this.playerOne, this.playerTwo, this.settings.moneyForKill);
+	}
+	iteration() {
+			this.field.iteration();
 	}
 }
