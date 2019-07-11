@@ -74,9 +74,19 @@ class Field {
 			$('#cell-' + j + i).html(target.resultHp);
 		}
 		else {
-			console.log(target);
+			let owner = target.attaker.owner;
+			console.log("Owner hp = " + owner.hp);
+			console.log("Atacker hp = " + target.attaker.hp);
+			owner.hp = Math.round(target.attaker.hp * 0.3);
+			target.attaker.hp - owner.hp;
+			
+			console.log("Owner hp = " + owner.hp);
+			console.log("Atacker hp = " + target.attaker.hp);
+
 			this.field[i][j].owner = target.attaker.owner;
 			this.field[i][j].hp = target.attaker.owner.hp;
+
+
 			$('#cell-' + j + i).css({background: target.attaker.owner.color});
 			$('#cell-' + j + i).html(target.attaker.owner.hp);
 			this.addMoney(target.attaker.owner.name, this.moneyForKill);
